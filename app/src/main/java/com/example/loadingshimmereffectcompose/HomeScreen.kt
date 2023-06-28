@@ -34,7 +34,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.loadingshimmereffectcompose.ui.theme.LoadingShimmerEffectComposeTheme
 import kotlinx.coroutines.delay
@@ -107,10 +109,13 @@ fun ShimmerListItem(
 
 //Hero Code of the Project
 fun Modifier.shimmerEffect(): Modifier = composed {
+    var size by remember{
+        mutableStateOf(IntSize.Zero)
+    }
     val infiniteTransition = rememberInfiniteTransition()
     val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
+        initialValue = -2 * size.width.toFloat(),
+        targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = 1000,
@@ -123,10 +128,11 @@ fun Modifier.shimmerEffect(): Modifier = composed {
             Color.LightGray.copy(0.2f),
             Color.LightGray.copy(0.6f),
         ),
-        start = Offset.Zero,
-        end = Offset( x = animatedOffset, y = animatedOffset)
+        start = Offset(animatedOffset, 0f),
+        end = Offset( x = animatedOffset + size.width.toFloat(), y = size.height.toFloat())
     )
     background(brush)
+        .onGloballyPositioned { size = it.size }
 }
 
 @Preview(showBackground = true)
